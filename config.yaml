@@ -1,7 +1,7 @@
 smtp_config:
   smtp_server: smtp.gmail.com
   smtp_port: 465
-  sender: sender@gmail.com
+  sender: flaskapp90@gmail.com
   password: yourpassword
 
 twillio_config:
