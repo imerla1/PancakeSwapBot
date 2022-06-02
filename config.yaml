@@ -1,11 +1,11 @@
 smtp_config:
   smtp_server: smtp.gmail.com
   smtp_port: 465
-  sender: sender@gmail.com
-  password: yourpassword
+  sender: mail@gmail.com
+  password: password
 
 twillio_config:
-  account_sid: "xyz" # switch with real one
-  auth_token: "xyz" # switch with real one
-  from_number: "+12345678" # caller number switch with real one
+  account_sid: "sid" # switch with real one
+  auth_token: "token" # switch with real one
+  from_number: "+123456" # caller number switch with real one
   
