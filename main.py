@@ -44,6 +44,7 @@ class bcolors:
 voting_logger = setup_logger("voting_logger", 'voting.log')
 alert_logger = setup_logger("alert_logger", "alerts.log")
 
+
 print(bcolors.OKGREEN + """
                                           _                 _            _       
  _____  _   _  _____  _   _  _____  _    _  ______  _   _____ 
@@ -56,6 +57,14 @@ print(bcolors.OKGREEN + """
        
 """ + bcolors.ENDC)
 
+_file = "config.yaml"
+yaml_config = YamlConfigParser(_file, debug_logger)
+config_data = yaml_config.load_config()
+smtp_config_dict = config_data['smtp_config']
+twillio_config_dict = config_data["twillio_config"]
+
+smtp_config = SmtpConfigSchema(**smtp_config_dict)
+twillio_config = TwillioConfigSchema(**twillio_config_dict)
 
 # Turning off default loggers
 selenium_logger = logging.getLogger(
@@ -233,14 +242,16 @@ class VotingBot(object):
 
             if self.voting_cache is not None and self.voting_cache != names and names != "No proposals found" and names != None:
                 msg = self.create_alert_msg(self.voting_cache, names)
-                make_phone_call(alert_logger, from_="", to="")
-                make_phone_call(alert_logger, from_="", to="")
+                make_phone_call(twillio_config.account_sid,
+                                twillio_config.auth_token, alert_logger, twillio_config.from_number, to="+995591079307")
+                
 
                 send_mail(alert_logger, msg, "receiver@gmail.com", **cfg)
 
                 # 45 SECOND Dealy for other users
                 sleep(45)
-                make_phone_call(alert_logger, from_="", to="")
+                make_phone_call(twillio_config.account_sid,
+                                twillio_config.auth_token, alert_logger, twillio_config.from_number, to="+995591079307")
                 send_mail(alert_logger, msg, "receiver@protonmail.com", **cfg)
 
             self.voting_cache = names
