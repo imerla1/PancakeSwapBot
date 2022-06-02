@@ -1,0 +1,2 @@
+class VerifyApiException(Exception):
+    pass
