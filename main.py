@@ -19,14 +19,15 @@ from utils.exceptions import VerifyApiException
 from utils.call_handler import make_phone_call
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-
+from schemas.app_schema import SmtpConfigSchema, TwillioConfigSchema
+from config_parser import YamlConfigParser
 
 """
 For Voting
 """
 
 __author__ = "PYT4ONGIG"
-__VERSION__ = 0.4
+__VERSION__ = 0.6
 
 
 class bcolors:
@@ -43,6 +44,15 @@ class bcolors:
 
 voting_logger = setup_logger("voting_logger", 'voting.log')
 alert_logger = setup_logger("alert_logger", "alerts.log")
+_file = "config.yaml"
+
+yaml_config = YamlConfigParser(_file, voting_logger)
+config_data = yaml_config.load_config()
+smtp_config_dict = config_data['smtp_config']
+twillio_config_dict = config_data["twillio_config"]
+
+smtp_config = SmtpConfigSchema(**smtp_config_dict)
+twillio_config = TwillioConfigSchema(**twillio_config_dict)
 
 print(bcolors.OKGREEN + """
                                           _                 _            _       
@@ -75,6 +85,7 @@ def get_driver(browser_name, driver_path=None, options=None):
     # Configure Drivers based on os
     # You can pass driver Path manually
     # Supports only chrome and firefox
+    # NOTE depricated we don't need to use this method because we updated to Webdriver Manger
     driver = None
     browser = browser_name.lower()
     assert browser in (
@@ -114,10 +125,10 @@ def init_browser(browser_name):
 
 cfg = {
     "subject": "Voting",
-    "sender": "flaskapp90@gmail.com",
-    "password": os.getenv("password"),
-    "smtp_server": "smtp.gmail.com",
-    "port": 465
+    "sender": smtp_config.sender,
+    "password": smtp_config.password,
+    "smtp_server": smtp_config.smtp_server,
+    "port": smtp_config.smtp_port
 }
 
 read_from_cache = False
@@ -233,15 +244,16 @@ class VotingBot(object):
 
             if self.voting_cache is not None and self.voting_cache != names and names != "No proposals found" and names != None:
                 msg = self.create_alert_msg(self.voting_cache, names)
-                make_phone_call(alert_logger, from_="", to="")
-                make_phone_call(alert_logger, from_="", to="")
+                make_phone_call(twillio_config.account_sid,
+                                twillio_config.auth_token, alert_logger, twillio_config.from_number, to="+995591079307")
 
-                send_mail(alert_logger, msg, "receiver@gmail.com", **cfg)
+                send_mail(alert_logger, msg, "giorgi1048@yahoo.com", **cfg)
 
                 # 45 SECOND Dealy for other users
                 sleep(45)
-                make_phone_call(alert_logger, from_="", to="")
-                send_mail(alert_logger, msg, "receiver@protonmail.com", **cfg)
+                make_phone_call(twillio_config.account_sid,
+                                twillio_config.auth_token, alert_logger, from_=twillio_config.from_number , to="+995591079307")
+                send_mail(alert_logger, msg, "georgeimerlishvili1048@gmail.com", **cfg)
 
             self.voting_cache = names
             print(f"Cache List {self.voting_cache}")

@@ -2,10 +2,10 @@ smtp_config:
   smtp_server: smtp.gmail.com
   smtp_port: 465
   sender: flaskapp90@gmail.com
-  password: yourpassword
+  password: imerla1234
 
 twillio_config:
-  account_sid: "xyz" # switch with real one
-  auth_token: "xyz" # switch with real one
-  from_number: "+12345678" # caller number switch with real one
+  account_sid: "AC4c8726d79b68ea452ad74313bbe90b9a" # switch with real one
+  auth_token: "94d14a624d52aa70e425a07125fbfbc4" # switch with real one
+  from_number: "+447782386418" # caller number switch with real one
   
